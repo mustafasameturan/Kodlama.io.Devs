@@ -7,6 +7,8 @@ import mustafasamet.devs.business.requests.programmingTechnology.DeleteProgrammi
 import mustafasamet.devs.business.requests.programmingTechnology.UpdateProgrammingTechnologyRequest;
 import mustafasamet.devs.business.responses.programmingTechnology.GetAllProgrammingTechnologiesResponse;
 import mustafasamet.devs.business.responses.programmingTechnology.GetByIdProgrammingTechnologyResponse;
+import mustafasamet.devs.core.utilities.results.DataResult;
+import mustafasamet.devs.core.utilities.results.Result;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,27 +24,27 @@ public class ProgrammingTechnologiesController {
     }
 
     @GetMapping("/getall")
-    public List<GetAllProgrammingTechnologiesResponse> getAll(){
+    public DataResult<List<GetAllProgrammingTechnologiesResponse>> getAll(){
         return _programmingTechnologyService.getAll();
     }
 
     @GetMapping("/getbyid/{id}")
-    public GetByIdProgrammingTechnologyResponse getById(int id){
+    public DataResult<GetByIdProgrammingTechnologyResponse> getById(int id){
         return _programmingTechnologyService.getById(id);
     }
 
     @PostMapping("/add")
-    public void add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest){
-        _programmingTechnologyService.add(createProgrammingTechnologyRequest);
+    public Result add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest){
+        return _programmingTechnologyService.add(createProgrammingTechnologyRequest);
     }
 
     @PutMapping("/update")
-    public void update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest){
-        _programmingTechnologyService.update(updateProgrammingTechnologyRequest);
+    public Result update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest){
+        return _programmingTechnologyService.update(updateProgrammingTechnologyRequest);
     }
 
     @DeleteMapping("/delete")
-    public void delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest){
-        _programmingTechnologyService.delete(deleteProgrammingTechnologyRequest);
+    public Result delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest){
+        return _programmingTechnologyService.delete(deleteProgrammingTechnologyRequest);
     }
 }

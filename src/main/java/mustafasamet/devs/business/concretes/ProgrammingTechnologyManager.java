@@ -1,6 +1,7 @@
 package mustafasamet.devs.business.concretes;
 
 import mustafasamet.devs.business.abstracts.ProgrammingTechnologyService;
+import mustafasamet.devs.business.constants.Messages;
 import mustafasamet.devs.business.requests.programmingLanguage.DeleteProgrammingLanguageRequest;
 import mustafasamet.devs.business.requests.programmingLanguage.UpdateProgrammingLanguageRequest;
 import mustafasamet.devs.business.requests.programmingTechnology.CreateProgrammingTechnologyRequest;
@@ -8,6 +9,8 @@ import mustafasamet.devs.business.requests.programmingTechnology.DeleteProgrammi
 import mustafasamet.devs.business.requests.programmingTechnology.UpdateProgrammingTechnologyRequest;
 import mustafasamet.devs.business.responses.programmingTechnology.GetAllProgrammingTechnologiesResponse;
 import mustafasamet.devs.business.responses.programmingTechnology.GetByIdProgrammingTechnologyResponse;
+import mustafasamet.devs.core.utilities.business.BusinessRules;
+import mustafasamet.devs.core.utilities.results.*;
 import mustafasamet.devs.dataAccess.concretes.ProgrammingLanguageRepository;
 import mustafasamet.devs.dataAccess.concretes.ProgrammingTechnologyRepository;
 import mustafasamet.devs.entities.concretes.ProgrammingLanguage;
@@ -28,10 +31,8 @@ public class ProgrammingTechnologyManager implements ProgrammingTechnologyServic
         _programmingLanguageRepository = programmingLanguageRepository;
     }
 
-    //business rules will add
-
     @Override
-    public List<GetAllProgrammingTechnologiesResponse> getAll() {
+    public DataResult<List<GetAllProgrammingTechnologiesResponse>> getAll() {
         List<ProgrammingTechnology> programmingTechnologies = _programmingTechnologyRepository.findAll();
         List<GetAllProgrammingTechnologiesResponse> programmingTechnologiesResponse = new ArrayList<>();
 
@@ -43,22 +44,27 @@ public class ProgrammingTechnologyManager implements ProgrammingTechnologyServic
             programmingTechnologiesResponse.add(responseItem);
         }
 
-        return programmingTechnologiesResponse;
+        return new SuccessDataResult<List<GetAllProgrammingTechnologiesResponse>>(programmingTechnologiesResponse, Messages.PROGRAMMING_TECHNOLOGIES_LISTED);
     }
 
     @Override
-    public GetByIdProgrammingTechnologyResponse getById(int id) {
+    public DataResult<GetByIdProgrammingTechnologyResponse> getById(int id) {
         ProgrammingTechnology programmingTechnology = _programmingTechnologyRepository.findById(id).get();
         GetByIdProgrammingTechnologyResponse responseItem = new GetByIdProgrammingTechnologyResponse();
         responseItem.setId(programmingTechnology.getId());
         responseItem.setName(programmingTechnology.getName());
         responseItem.setProgrammingLanguageName(programmingTechnology.getProgrammingLanguage().getName());
 
-        return responseItem;
+        return new SuccessDataResult<GetByIdProgrammingTechnologyResponse>(responseItem, Messages.PROGRAMMING_TECHNOLOGY_GET_BY_ID);
     }
 
     @Override
-    public void add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest) {
+    public Result add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest) {
+        Result result = BusinessRules.Run(checkIfProgrammingTechnologyNameExist(createProgrammingTechnologyRequest.getName()),
+                                          checkIfProgrammingTechnologyNameIsEmpty(createProgrammingTechnologyRequest.getName()));
+        if(result != null) {
+            return result;
+        }
         ProgrammingTechnology programmingTechnology = new ProgrammingTechnology();
         ProgrammingLanguage programmingLanguage = _programmingLanguageRepository.findById(createProgrammingTechnologyRequest.getProgrammingLanguageId()).get();
 
@@ -66,10 +72,17 @@ public class ProgrammingTechnologyManager implements ProgrammingTechnologyServic
         programmingTechnology.setProgrammingLanguage(programmingLanguage);
 
         _programmingTechnologyRepository.save(programmingTechnology);
+
+        return new SuccessResult(Messages.PROGRAMMING_TECHNOLOGY_ADDED);
     }
 
     @Override
-    public void update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest) {
+    public Result update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest) {
+        Result result = BusinessRules.Run(checkIfProgrammingTechnologyIdDoesntExist(updateProgrammingTechnologyRequest.getId()));
+        if(result != null) {
+            return result;
+        }
+
         ProgrammingTechnology programmingTechnology = _programmingTechnologyRepository.findById(updateProgrammingTechnologyRequest.getId()).get();
         ProgrammingLanguage programmingLanguage = _programmingLanguageRepository.findById(updateProgrammingTechnologyRequest.getProgrammingLanguageId()).get();
 
@@ -77,10 +90,44 @@ public class ProgrammingTechnologyManager implements ProgrammingTechnologyServic
         programmingTechnology.setProgrammingLanguage(programmingLanguage);
 
         _programmingTechnologyRepository.save(programmingTechnology);
+        return new SuccessResult(Messages.PROGRAMMING_TECHNOLOGY_UPDATED);
     }
 
     @Override
-    public void delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest) {
+    public Result delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest) {
+        Result result = BusinessRules.Run(checkIfProgrammingTechnologyIdDoesntExist(deleteProgrammingTechnologyRequest.getId()));
+        if(result != null) {
+            return result;
+        }
+
         _programmingTechnologyRepository.deleteById(deleteProgrammingTechnologyRequest.getId());
+        return new SuccessResult(Messages.PROGRAMMING_TECHNOLOGY_DELETED);
+    }
+
+    //Business Rules
+    public Result checkIfProgrammingTechnologyNameExist(String name){
+        List<ProgrammingTechnology> programmingTechnologies = _programmingTechnologyRepository.findAll();
+        for(ProgrammingTechnology programmingTechnology : programmingTechnologies){
+            if(programmingTechnology.getName().equals(name)){
+                return new ErrorResult(Messages.PROGRAMMING_TECHNOLOGY_NAME_EXIST);
+            }
+        }
+        return new SuccessResult();
+    }
+
+    public Result checkIfProgrammingTechnologyNameIsEmpty(String name){
+        if(name.isEmpty()){
+            return new ErrorResult(Messages.PROGRAMMING_TECHNOLOGY_NAME_CANNOT_BE_EMPTY);
+        }
+        return new SuccessResult();
+    }
+
+    public Result checkIfProgrammingTechnologyIdDoesntExist(int id){
+        boolean programmingTechnology = _programmingTechnologyRepository.existsById(id);
+        if(programmingTechnology == false){
+            return new ErrorResult(Messages.PROGRAMMING_TECHNOLOGY_DOESNT_EXIST);
+        }
+
+        return new SuccessResult();
     }
 }

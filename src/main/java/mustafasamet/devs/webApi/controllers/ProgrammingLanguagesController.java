@@ -5,10 +5,14 @@ import mustafasamet.devs.business.requests.programmingLanguage.CreateProgramming
 import mustafasamet.devs.business.requests.programmingLanguage.DeleteProgrammingLanguageRequest;
 import mustafasamet.devs.business.requests.programmingLanguage.UpdateProgrammingLanguageRequest;
 import mustafasamet.devs.business.responses.programmingLanguage.GetAllProgrammingLanguagesResponse;
+import mustafasamet.devs.business.responses.programmingLanguage.GetAllProgrammingLanguagesWithProgrammingTechnologiesResponse;
 import mustafasamet.devs.business.responses.programmingLanguage.GetByIdProgrammingLanguageResponse;
+import mustafasamet.devs.core.utilities.results.DataResult;
+import mustafasamet.devs.core.utilities.results.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 @RestController
@@ -23,27 +27,32 @@ public class ProgrammingLanguagesController {
     }
 
     @GetMapping("/getall")
-    public List<GetAllProgrammingLanguagesResponse> getAll(){
+    public DataResult<List<GetAllProgrammingLanguagesResponse>> getAll(){
         return _programmingLanguageService.getAll();
     }
 
+    @GetMapping("/getallwithprogrammingtechnologies")
+    public DataResult<List<GetAllProgrammingLanguagesWithProgrammingTechnologiesResponse>> getAllWithProgrammingTechnologies(){
+        return _programmingLanguageService.getAllWithProgrammingTechnologies();
+    }
+
     @GetMapping("/getbyid/{id}")
-    public GetByIdProgrammingLanguageResponse getById(@RequestParam int id){
+    public DataResult<GetByIdProgrammingLanguageResponse> getById(@RequestParam int id){
         return _programmingLanguageService.getById(id);
     }
 
     @PostMapping("/add")
-    public void add(@RequestBody CreateProgrammingLanguageRequest createProgrammingLanguageRequest){
-        _programmingLanguageService.add(createProgrammingLanguageRequest);
+    public Result add(@RequestBody CreateProgrammingLanguageRequest createProgrammingLanguageRequest){
+        return _programmingLanguageService.add(createProgrammingLanguageRequest);
     }
 
     @PutMapping("/update")
-    public void update(@RequestBody UpdateProgrammingLanguageRequest updateProgrammingLanguageRequest){
-        _programmingLanguageService.update(updateProgrammingLanguageRequest);
+    public Result update(@RequestBody UpdateProgrammingLanguageRequest updateProgrammingLanguageRequest){
+        return _programmingLanguageService.update(updateProgrammingLanguageRequest);
     }
 
     @DeleteMapping("/delete")
-    public void delete(@RequestBody DeleteProgrammingLanguageRequest deleteProgrammingLanguageRequest){
-        _programmingLanguageService.delete(deleteProgrammingLanguageRequest);
+    public Result delete(@RequestBody DeleteProgrammingLanguageRequest deleteProgrammingLanguageRequest){
+        return _programmingLanguageService.delete(deleteProgrammingLanguageRequest);
     }
 }

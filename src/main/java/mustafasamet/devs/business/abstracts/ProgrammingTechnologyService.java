@@ -7,15 +7,16 @@ import mustafasamet.devs.business.requests.programmingTechnology.DeleteProgrammi
 import mustafasamet.devs.business.requests.programmingTechnology.UpdateProgrammingTechnologyRequest;
 import mustafasamet.devs.business.responses.programmingTechnology.GetAllProgrammingTechnologiesResponse;
 import mustafasamet.devs.business.responses.programmingTechnology.GetByIdProgrammingTechnologyResponse;
+import mustafasamet.devs.core.utilities.results.DataResult;
+import mustafasamet.devs.core.utilities.results.Result;
 
 import java.util.List;
 
 public interface ProgrammingTechnologyService {
 
-    List<GetAllProgrammingTechnologiesResponse> getAll();
-    GetByIdProgrammingTechnologyResponse getById(int id);
-
-    void add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest);
-    void update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest);
-    void delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest);
+    DataResult<List<GetAllProgrammingTechnologiesResponse>> getAll();
+    DataResult<GetByIdProgrammingTechnologyResponse> getById(int id);
+    Result add(CreateProgrammingTechnologyRequest createProgrammingTechnologyRequest);
+    Result update(UpdateProgrammingTechnologyRequest updateProgrammingTechnologyRequest);
+    Result delete(DeleteProgrammingTechnologyRequest deleteProgrammingTechnologyRequest);
 }
